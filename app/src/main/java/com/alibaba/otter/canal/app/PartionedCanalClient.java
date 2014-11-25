@@ -101,8 +101,9 @@ public class PartionedCanalClient extends AbstractCanalClient {
                                 String.valueOf(entry.getHeader().getLogfileOffset()), entry.getHeader().getSchemaName(),
                                 entry.getHeader().getTableName(), eventType,
                                 String.valueOf(entry.getHeader().getExecuteTime()), String.valueOf(delayTime)});
+
                 if (!entry.getHeader().getTableName().equals(schema.getName())) {
-                    return;
+                    continue;
                 }
 
                 if (eventType == CanalEntry.EventType.QUERY || rowChage.getIsDdl()) {
@@ -151,7 +152,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
         // 根据ip，直接创建链接，无HA的功能
         String[] destinations = {"hotelmaster01", "hotelmaster02", "hotelmaster03", "hotelmaster04"};
         String confDir = System.getProperty("canal.conf.dir");
-        String schemaPath = confDir + "/schema/com.elong.corp.hotel_base_master.1.avsc";
+        String schemaPath = confDir + "/schema/com.elong.corp.hotel_property_master.1.avsc";
 
         final List<PartionedCanalClient> clients = new LinkedList<PartionedCanalClient>();
 

@@ -1,0 +1,67 @@
+{
+  "type" : "record",
+  "name" : "hotel_property_master",
+  "doc" : "Sqoop import of hotel_property_master",
+  "fields" : [ {
+    "name" : "id",
+    "type" : [ "long", "null" ],
+    "sqlType" : "-5",
+    "columnName" : "id"
+  }, {
+    "name" : "hotel_id",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "hotel_id"
+  }, {
+    "name" : "roomtype_id",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "roomtype_id"
+  }, {
+    "name" : "property_id",
+    "type" : [ "long", "null" ],
+    "sqlType" : "-5",
+    "columnName" : "property_id"
+  }, {
+    "name" : "shotel_id",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "shotel_id"
+  }, {
+    "name" : "memo",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "memo"
+  }, {
+    "name" : "create_time",
+    "type" : [ "long", "null" ],
+    "sqlType" : "93",
+    "columnName" : "create_time"
+  }, {
+    "name" : "creator",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "creator"
+  }, {
+    "name" : "create_ip",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "create_ip"
+  }, {
+    "name" : "op_time",
+    "type" : [ "long", "null" ],
+    "sqlType" : "93",
+    "columnName" : "op_time"
+  }, {
+    "name" : "operator",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "operator"
+  }, {
+    "name" : "op_ip",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "op_ip"
+  } ],
+  "tableName" : "hotel_property_master"
+}
