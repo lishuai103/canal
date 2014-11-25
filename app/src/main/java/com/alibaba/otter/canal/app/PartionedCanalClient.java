@@ -43,6 +43,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
     }
 
     public synchronized static void append(GenericRecord record) throws IOException {
+        logger.info("append invoked\n");
         writer.append(record);
     }
 
@@ -132,8 +133,9 @@ public class PartionedCanalClient extends AbstractCanalClient {
     @Override
     protected void processColumn(List<CanalEntry.Column> columns) {
         GenericData.Record record = new GenericData.Record(schema);
+        logger.info("create a new recode\n");
         for (CanalEntry.Column column : columns) {
-            record.put(column.getName(), column.toByteString());
+            record.put(column.getName(), column.toByteArray());
             StringBuilder builder = new StringBuilder();
             builder.append(column.getName() + " : " + column.getValue());
             builder.append("    type=" + column.getMysqlType());
