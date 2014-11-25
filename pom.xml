@@ -125,7 +125,7 @@
 		<module>server</module>
 		<module>client</module>
 		<module>deployer</module>
-		<module>example</module>
+		<module>app</module>
 	</modules>
 	
 	<dependencyManagement>
