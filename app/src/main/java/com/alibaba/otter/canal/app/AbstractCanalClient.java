@@ -214,18 +214,18 @@ public class AbstractCanalClient {
 
                 for (RowData rowData : rowChage.getRowDatasList()) {
                     if (eventType == EventType.DELETE) {
-                        printColumn(rowData.getBeforeColumnsList());
+                        processColumn(rowData.getBeforeColumnsList());
                     } else if (eventType == EventType.INSERT) {
-                        printColumn(rowData.getAfterColumnsList());
+                        processColumn(rowData.getAfterColumnsList());
                     } else {
-                        printColumn(rowData.getAfterColumnsList());
+                        processColumn(rowData.getAfterColumnsList());
                     }
                 }
             }
         }
     }
 
-    protected void printColumn(List<Column> columns) {
+    protected void processColumn(List<Column> columns) {
         for (Column column : columns) {
             StringBuilder builder = new StringBuilder();
             builder.append(column.getName() + " : " + column.getValue());

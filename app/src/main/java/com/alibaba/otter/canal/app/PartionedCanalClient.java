@@ -3,7 +3,12 @@ package com.alibaba.otter.canal.app;
 import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.common.utils.AddressUtils;
+import com.alibaba.otter.canal.protocol.CanalEntry;
 import org.apache.avro.Schema;
+import org.apache.avro.file.DataFileWriter;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumWriter;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.File;
@@ -20,17 +25,47 @@ import java.util.List;
  */
 public class PartionedCanalClient extends AbstractCanalClient {
     private Schema schema;
+    private static DataFileWriter<GenericRecord> writer;
 
     public PartionedCanalClient(String destination, String schemaPath) throws IOException {
         super(destination);
         this.schema = getSchemaFromFile(schemaPath);
+        File file = new File("schemaPath" + ".data");
+        writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter());
+        writer.create(schema, file);
+    }
+
+    public synchronized static void append(GenericRecord record) throws IOException {
+        writer.append(record);
     }
 
     public static Schema getSchemaFromFile(String path) throws IOException {
         File file = new File(path);
         Schema schema = Schema.parse(file);
-        logger.info(schema.getFullName());
         return schema;
+    }
+
+    protected void processColumn(List<CanalEntry.Column> columns) {
+        GenericData.Record record = new GenericData.Record(schema);
+        for (CanalEntry.Column column : columns) {
+            record.put(column.getName(), column.toByteString());
+            StringBuilder builder = new StringBuilder();
+            builder.append(column.getName() + " : " + column.getValue());
+            builder.append("    type=" + column.getMysqlType());
+            if (column.getUpdated()) {
+                builder.append("    update=" + column.getUpdated());
+            }
+            builder.append(SEP);
+            logger.info(builder.toString());
+        }
+        try {
+            PartionedCanalClient.append(record);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+
     }
 
     public static void main(String args[]) throws IOException {
@@ -61,6 +96,11 @@ public class PartionedCanalClient extends AbstractCanalClient {
                     } finally {
                         logger.info("## canal client is down.");
                     }
+                }
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
 
