@@ -4,6 +4,7 @@ import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.common.utils.AddressUtils;
 import com.alibaba.otter.canal.protocol.CanalEntry;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
@@ -14,6 +15,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,6 +47,83 @@ public class PartionedCanalClient extends AbstractCanalClient {
         return schema;
     }
 
+    @Override
+    protected void processEntrys(List<CanalEntry.Entry> entrys) {
+        for (CanalEntry.Entry entry : entrys) {
+            long executeTime = entry.getHeader().getExecuteTime();
+            long delayTime = new Date().getTime() - executeTime;
+
+            if (entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONBEGIN || entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONEND) {
+                if (entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONBEGIN) {
+                    CanalEntry.TransactionBegin begin = null;
+                    try {
+                        begin = CanalEntry.TransactionBegin.parseFrom(entry.getStoreValue());
+                    } catch (InvalidProtocolBufferException e) {
+                        throw new RuntimeException("parse event has an error , data:" + entry.toString(), e);
+                    }
+                    // 打印事务头信息，执行的线程id，事务耗时
+                    logger.info(transaction_format,
+                            new Object[]{entry.getHeader().getLogfileName(),
+                                    String.valueOf(entry.getHeader().getLogfileOffset()),
+                                    String.valueOf(entry.getHeader().getExecuteTime()), String.valueOf(delayTime)});
+                    logger.info(destination + " BEGIN ----> Thread id: {}", begin.getThreadId());
+                } else if (entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONEND) {
+                    CanalEntry.TransactionEnd end = null;
+                    try {
+                        end = CanalEntry.TransactionEnd.parseFrom(entry.getStoreValue());
+                    } catch (InvalidProtocolBufferException e) {
+                        throw new RuntimeException("parse event has an error , data:" + entry.toString(), e);
+                    }
+                    // 打印事务提交信息，事务id
+                    logger.info("----------------\n");
+                    logger.info(" END ----> transaction id: {}", end.getTransactionId());
+                    logger.info(transaction_format,
+                            new Object[]{entry.getHeader().getLogfileName(),
+                                    String.valueOf(entry.getHeader().getLogfileOffset()),
+                                    String.valueOf(entry.getHeader().getExecuteTime()), String.valueOf(delayTime)});
+                }
+
+                continue;
+            }
+
+            if (entry.getEntryType() == CanalEntry.EntryType.ROWDATA) {
+                CanalEntry.RowChange rowChage = null;
+                try {
+                    rowChage = CanalEntry.RowChange.parseFrom(entry.getStoreValue());
+                } catch (Exception e) {
+                    throw new RuntimeException("parse event has an error , data:" + entry.toString(), e);
+                }
+
+                CanalEntry.EventType eventType = rowChage.getEventType();
+
+                logger.info(row_format,
+                        new Object[]{entry.getHeader().getLogfileName(),
+                                String.valueOf(entry.getHeader().getLogfileOffset()), entry.getHeader().getSchemaName(),
+                                entry.getHeader().getTableName(), eventType,
+                                String.valueOf(entry.getHeader().getExecuteTime()), String.valueOf(delayTime)});
+                if (!entry.getHeader().getTableName().equals(schema.getName())) {
+                    return;
+                }
+
+                if (eventType == CanalEntry.EventType.QUERY || rowChage.getIsDdl()) {
+                    logger.info(" sql ----> " + rowChage.getSql() + SEP);
+                    continue;
+                }
+
+                for (CanalEntry.RowData rowData : rowChage.getRowDatasList()) {
+                    if (eventType == CanalEntry.EventType.DELETE) {
+                        processColumn(rowData.getBeforeColumnsList());
+                    } else if (eventType == CanalEntry.EventType.INSERT) {
+                        processColumn(rowData.getAfterColumnsList());
+                    } else {
+                        processColumn(rowData.getAfterColumnsList());
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     protected void processColumn(List<CanalEntry.Column> columns) {
         GenericData.Record record = new GenericData.Record(schema);
         for (CanalEntry.Column column : columns) {
