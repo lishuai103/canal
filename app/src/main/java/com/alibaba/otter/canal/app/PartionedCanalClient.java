@@ -27,14 +27,19 @@ import java.util.List;
  */
 public class PartionedCanalClient extends AbstractCanalClient {
     private Schema schema;
-    private static DataFileWriter<GenericRecord> writer;
+    private static DataFileWriter<GenericRecord> writer = null;
 
     public PartionedCanalClient(String destination, String schemaPath) throws IOException {
         super(destination);
         this.schema = getSchemaFromFile(schemaPath);
-        File file = new File("schemaPath" + ".data");
-        writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter());
-        writer.create(schema, file);
+        synchronized (writer) {
+            if (null == writer) {
+                File file = new File(schemaPath + "avro.data");
+                writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter());
+                writer.create(schema, file);
+                logger.info("avro writer created");
+            }
+        }
     }
 
     public synchronized static void append(GenericRecord record) throws IOException {
