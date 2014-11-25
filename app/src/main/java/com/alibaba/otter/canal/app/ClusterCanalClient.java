@@ -1,4 +1,4 @@
-package com.alibaba.otter.canal.example;
+package com.alibaba.otter.canal.app;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 
@@ -11,9 +11,9 @@ import com.alibaba.otter.canal.client.CanalConnectors;
  * @author jianghang 2013-4-15 下午04:19:20
  * @version 1.0.4
  */
-public class ClusterCanalClientTest extends AbstractCanalClientTest {
+public class ClusterCanalClient extends AbstractCanalClient {
 
-    public ClusterCanalClientTest(String destination){
+    public ClusterCanalClient(String destination){
         super(destination);
     }
 
@@ -30,7 +30,7 @@ public class ClusterCanalClientTest extends AbstractCanalClientTest {
         // 基于zookeeper动态获取canal server的地址，建立链接，其中一台server发生crash，可以支持failover
         CanalConnector connector = CanalConnectors.newClusterConnector("127.0.0.1:2181", destination, "", "");
 
-        final ClusterCanalClientTest clientTest = new ClusterCanalClientTest(destination);
+        final ClusterCanalClient clientTest = new ClusterCanalClient(destination);
         clientTest.setConnector(connector);
         clientTest.start();
 

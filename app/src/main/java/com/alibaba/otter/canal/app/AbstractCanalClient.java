@@ -1,9 +1,9 @@
-package com.alibaba.otter.canal.example;
+package com.alibaba.otter.canal.app;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
+import com.alibaba.otter.canal.client.CanalConnector;
+import com.alibaba.otter.canal.protocol.CanalEntry.*;
+import com.alibaba.otter.canal.protocol.Message;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,17 +11,9 @@ import org.slf4j.MDC;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import com.alibaba.otter.canal.client.CanalConnector;
-import com.alibaba.otter.canal.protocol.CanalEntry.Column;
-import com.alibaba.otter.canal.protocol.CanalEntry.Entry;
-import com.alibaba.otter.canal.protocol.CanalEntry.EntryType;
-import com.alibaba.otter.canal.protocol.CanalEntry.EventType;
-import com.alibaba.otter.canal.protocol.CanalEntry.RowChange;
-import com.alibaba.otter.canal.protocol.CanalEntry.RowData;
-import com.alibaba.otter.canal.protocol.CanalEntry.TransactionBegin;
-import com.alibaba.otter.canal.protocol.CanalEntry.TransactionEnd;
-import com.alibaba.otter.canal.protocol.Message;
-import com.google.protobuf.InvalidProtocolBufferException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 测试基类
@@ -29,9 +21,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * @author jianghang 2013-4-15 下午04:17:12
  * @version 1.0.4
  */
-public class AbstractCanalClientTest {
+public class AbstractCanalClient {
 
-    protected final static Logger             logger             = LoggerFactory.getLogger(AbstractCanalClientTest.class);
+    protected final static Logger             logger             = LoggerFactory.getLogger(AbstractCanalClient.class);
     protected static final String             SEP                = SystemUtils.LINE_SEPARATOR;
     protected static final String             DATE_FORMAT        = "yyyy-MM-dd HH:mm:ss";
     protected volatile boolean                running            = false;
@@ -63,11 +55,11 @@ public class AbstractCanalClientTest {
 
     }
 
-    public AbstractCanalClientTest(String destination){
+    public AbstractCanalClient(String destination){
         this(destination, null);
     }
 
-    public AbstractCanalClientTest(String destination, CanalConnector connector){
+    public AbstractCanalClient(String destination, CanalConnector connector){
         this.destination = destination;
         this.connector = connector;
     }
@@ -119,8 +111,8 @@ public class AbstractCanalClientTest {
                         // } catch (InterruptedException e) {
                         // }
                     } else {
-                        printSummary(message, batchId, size);
-                        printEntry(message.getEntries());
+                        processMessage(message, batchId, size);
+                        processEntrys(message.getEntries());
                     }
 
                     connector.ack(batchId); // 提交确认
@@ -135,7 +127,7 @@ public class AbstractCanalClientTest {
         }
     }
 
-    private void printSummary(Message message, long batchId, int size) {
+    private void processMessage(Message message, long batchId, int size) {
         long memsize = 0;
         for (Entry entry : message.getEntries()) {
             memsize += entry.getHeader().getEventLength();
@@ -161,7 +153,7 @@ public class AbstractCanalClientTest {
                + entry.getHeader().getExecuteTime() + "(" + format.format(date) + ")";
     }
 
-    protected void printEntry(List<Entry> entrys) {
+    protected void processEntrys(List<Entry> entrys) {
         for (Entry entry : entrys) {
             long executeTime = entry.getHeader().getExecuteTime();
             long delayTime = new Date().getTime() - executeTime;
@@ -179,7 +171,7 @@ public class AbstractCanalClientTest {
                         new Object[] { entry.getHeader().getLogfileName(),
                                 String.valueOf(entry.getHeader().getLogfileOffset()),
                                 String.valueOf(entry.getHeader().getExecuteTime()), String.valueOf(delayTime) });
-                    logger.info(" BEGIN ----> Thread id: {}", begin.getThreadId());
+                    logger.info(destination + " BEGIN ----> Thread id: {}", begin.getThreadId());
                 } else if (entry.getEntryType() == EntryType.TRANSACTIONEND) {
                     TransactionEnd end = null;
                     try {

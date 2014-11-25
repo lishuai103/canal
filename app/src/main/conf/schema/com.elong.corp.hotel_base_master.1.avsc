@@ -1,0 +1,157 @@
+{
+  "type" : "record",
+  "name" : "hotel_base_master",
+  "doc" : "Sqoop import of hotel_base_master",
+  "fields" : [ {
+    "name" : "id",
+    "type" : [ "long", "null" ],
+    "sqlType" : "-5",
+    "columnName" : "id"
+  }, {
+    "name" : "hotel_id",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "hotel_id"
+  }, {
+    "name" : "hotel_uniqueid",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "hotel_uniqueid"
+  }, {
+    "name" : "hotel_name",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "hotel_name"
+  }, {
+    "name" : "hotel_name_en",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "hotel_name_en"
+  }, {
+    "name" : "star",
+    "type" : [ "int", "null" ],
+    "sqlType" : "5",
+    "columnName" : "star"
+  }, {
+    "name" : "startype",
+    "type" : [ "int", "null" ],
+    "sqlType" : "5",
+    "columnName" : "startype"
+  }, {
+    "name" : "tel",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "tel"
+  }, {
+    "name" : "phone",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "phone"
+  }, {
+    "name" : "source_id",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "source_id"
+  }, {
+    "name" : "source_type",
+    "type" : [ "int", "null" ],
+    "sqlType" : "5",
+    "columnName" : "source_type"
+  }, {
+    "name" : "hotel_type",
+    "type" : [ "int", "null" ],
+    "sqlType" : "5",
+    "columnName" : "hotel_type"
+  }, {
+    "name" : "status",
+    "type" : [ "int", "null" ],
+    "sqlType" : "5",
+    "columnName" : "status"
+  }, {
+    "name" : "audit_status",
+    "type" : [ "int", "null" ],
+    "sqlType" : "5",
+    "columnName" : "audit_status"
+  }, {
+    "name" : "audit_remark",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "audit_remark"
+  }, {
+    "name" : "audit_opinion",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "audit_opinion"
+  }, {
+    "name" : "confidence",
+    "type" : [ "int", "null" ],
+    "sqlType" : "5",
+    "columnName" : "confidence"
+  }, {
+    "name" : "data_level",
+    "type" : [ "int", "null" ],
+    "sqlType" : "5",
+    "columnName" : "data_level"
+  }, {
+    "name" : "pull_status",
+    "type" : [ "int", "null" ],
+    "sqlType" : "4",
+    "columnName" : "pull_status"
+  }, {
+    "name" : "create_time",
+    "type" : [ "long", "null" ],
+    "sqlType" : "93",
+    "columnName" : "create_time"
+  }, {
+    "name" : "creator",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "creator"
+  }, {
+    "name" : "create_ip",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "create_ip"
+  }, {
+    "name" : "submit_time",
+    "type" : [ "long", "null" ],
+    "sqlType" : "93",
+    "columnName" : "submit_time"
+  }, {
+    "name" : "submitor",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "submitor"
+  }, {
+    "name" : "submit_ip",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "submit_ip"
+  }, {
+    "name" : "op_time",
+    "type" : [ "long", "null" ],
+    "sqlType" : "93",
+    "columnName" : "op_time"
+  }, {
+    "name" : "operator",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "operator"
+  }, {
+    "name" : "op_ip",
+    "type" : [ "string", "null" ],
+    "sqlType" : "12",
+    "columnName" : "op_ip"
+  }, {
+    "name" : "physic_status",
+    "type" : [ "int", "null" ],
+    "sqlType" : "4",
+    "columnName" : "physic_status"
+  }, {
+    "name" : "percentage",
+    "type" : [ "float", "null" ],
+    "sqlType" : "7",
+    "columnName" : "percentage"
+  } ],
+  "tableName" : "hotel_base_master"
+}
