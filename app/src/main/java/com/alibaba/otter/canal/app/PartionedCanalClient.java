@@ -36,7 +36,8 @@ public class PartionedCanalClient extends AbstractCanalClient {
     public static void main(String args[]) throws IOException {
         // 根据ip，直接创建链接，无HA的功能
         String[] destinations = {"hotelmaster01", "hotelmaster02", "hotelmaster03", "hotelmaster04"};
-        String schemaPath = "conf/schema/com.elong.corp.hotel_base_master.1.avsc";
+        String confDir = System.getProperty("canal.conf.dir");
+        String schemaPath = confDir + "/schema/com.elong.corp.hotel_base_master.1.avsc";
 
         final List<PartionedCanalClient> clients = new LinkedList<PartionedCanalClient>();
 

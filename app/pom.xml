@@ -106,7 +106,7 @@
 							<descriptors>
 								<descriptor>${basedir}/src/main/assembly/dev.xml</descriptor>
 							</descriptors>
-							<finalName>canal-example</finalName>
+							<finalName>canal-app</finalName>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</plugin>

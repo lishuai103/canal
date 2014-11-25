@@ -15,6 +15,8 @@ logback_configurationFile=$base/conf/logback.xml
 export LANG=en_US.UTF-8
 export BASE=$base
 
+canal_conf_dir=$base/conf/
+
 if [ -f $base/bin/canal.pid ] ; then
 	echo "found canal.pid , Please run stop.sh first ,then startup.sh" 2>&2
     exit 1
@@ -66,7 +68,7 @@ else
 fi
 
 JAVA_OPTS=" $JAVA_OPTS -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8"
-CANAL_OPTS="-DappName=otter-canal-example -Dlogback.configurationFile=$logback_configurationFile"
+CANAL_OPTS="-DappName=otter-canal-example -Dlogback.configurationFile=$logback_configurationFile -Dcanal.conf.dir=${canal_conf_dir}"
 
 if [ -e $logback_configurationFile ]
 then 
@@ -83,9 +85,9 @@ then
 	echo client mode : $client_mode 
 	echo CLASSPATH :$CLASSPATH
 	if [ $client_mode == "Cluster" ] ; then 
-		$JAVA $JAVA_OPTS $JAVA_DEBUG_OPT $CANAL_OPTS -classpath .:$CLASSPATH com.alibaba.otter.canal.example.ClusterCanalClientTest 1>>$base/bin/nohup.out 2>&1 &
+		$JAVA $JAVA_OPTS $JAVA_DEBUG_OPT $CANAL_OPTS -classpath .:$CLASSPATH com.alibaba.otter.canal.app.ClusterCanalClientTest 1>>$base/bin/nohup.out 2>&1 &
 	else 
-		$JAVA $JAVA_OPTS $JAVA_DEBUG_OPT $CANAL_OPTS -classpath .:$CLASSPATH com.alibaba.otter.canal.example.PartionedCanalClient 1>>$base/bin/nohup.out 2>&1 &
+		$JAVA $JAVA_OPTS $JAVA_DEBUG_OPT $CANAL_OPTS -classpath .:$CLASSPATH com.alibaba.otter.canal.app.PartionedCanalClient 1>>$base/bin/nohup.out 2>&1 &
 	fi
 	
 	echo $! > $base/bin/canal.pid 
