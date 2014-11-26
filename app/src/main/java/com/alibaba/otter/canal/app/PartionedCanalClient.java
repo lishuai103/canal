@@ -40,7 +40,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
         synchronized (writer) {
             if (!inited) {
                 File file = new File(schemaPath + ".data");
-                writer.create(schema, file);
+                //writer.create(schema, file);
                 inited = true;
                 logger.info("avro writer created");
             }
