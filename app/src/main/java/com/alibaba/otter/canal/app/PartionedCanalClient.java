@@ -41,7 +41,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
         synchronized (writer) {
             if (!inited) {
                 file = new File(schemaPath + ".data");
-                writer.create(schema, file);
+                //writer.create(schema, file);
                 inited = true;
                 logger.info("avro writer created");
             }
@@ -50,7 +50,8 @@ public class PartionedCanalClient extends AbstractCanalClient {
 
     public synchronized static void append(GenericRecord record) throws IOException {
         logger.info("append invoked\n");
-        writer.append(record);
+        //writer.append(record);
+        writer.appendTo(file);
     }
 
     public static Schema getSchemaFromFile(String path) throws IOException {
