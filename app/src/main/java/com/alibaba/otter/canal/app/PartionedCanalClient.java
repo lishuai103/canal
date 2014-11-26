@@ -15,6 +15,7 @@ import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.hadoop.conf.Configuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,16 @@ public class PartionedCanalClient extends AbstractCanalClient {
     private static DataFileWriter<GenericRecord> writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter());
     private static boolean inited = false;
     private static File file;
+    private static HdfsAvroAppender hdfsAvroAppender;
+
+    public static void setHdfsAvroAppender(HdfsAvroAppender hdfsAvroAppender) {
+        if (!inited) {
+            PartionedCanalClient.hdfsAvroAppender = hdfsAvroAppender;
+            inited = true;
+        } else {
+            return;
+        }
+    }
 
     public PartionedCanalClient(String destination, String schemaPath) throws IOException {
         super(destination);
@@ -44,7 +55,6 @@ public class PartionedCanalClient extends AbstractCanalClient {
         synchronized (writer) {
             if (!inited) {
                 file = new File(schemaPath + ".data");
-
                 try {
                     DatumReader<GenericRecord> datumReader = new GenericDatumReader<GenericRecord>(schema);
                     DataFileReader<GenericRecord> dataFileReader =
@@ -168,14 +178,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
             builder.append(SEP);
             logger.info(builder.toString());
         }
-        try {
-            PartionedCanalClient.append(record);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-
+        HdfsAvroAppender.append(record);
     }
 
     public static void main(String args[]) throws IOException {
@@ -183,6 +186,13 @@ public class PartionedCanalClient extends AbstractCanalClient {
         String[] destinations = {"hotelmaster01", "hotelmaster02", "hotelmaster03", "hotelmaster04"};
         String confDir = System.getProperty("canal.conf.dir");
         String schemaPath = confDir + "/schema/com.elong.corp.hotel_property_master.1.avsc";
+        String appendPath = "/user/jian.wang/test.append.data";
+        Configuration conf = new Configuration();
+        conf.set("fs.default.name", "hdfs://namenode001.hadoop.bjy.elong.com:9000");
+        HdfsAvroAppender hdfsAvroAppender = new HdfsAvroAppender(appendPath, conf, getSchemaFromFile(schemaPath));
+        hdfsAvroAppender.init();
+        setHdfsAvroAppender(hdfsAvroAppender);
+
 
         final List<PartionedCanalClient> clients = new LinkedList<PartionedCanalClient>();
 
