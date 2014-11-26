@@ -15,7 +15,10 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.InetSocketAddress;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,12 +38,12 @@ public class PartionedCanalClient extends AbstractCanalClient {
         super(destination);
         this.schema = getSchemaFromFile(schemaPath);
         synchronized (writer) {
-                if (!inited) {
-                    File file = new File(schemaPath + "avro.data");
-                    writer.create(schema, file);
-                    inited = true;
-                    logger.info("avro writer created");
-                }
+            if (!inited) {
+                File file = new File(schemaPath + "avro.data");
+                writer.create(schema, file);
+                inited = true;
+                logger.info("avro writer created");
+            }
         }
     }
 
@@ -194,6 +197,25 @@ public class PartionedCanalClient extends AbstractCanalClient {
             }
 
         });
+    }
+
+    private Object toAvro(Object o) {
+        boolean bigDecimalFormatString = false;
+        if (o instanceof BigDecimal) {
+            if (bigDecimalFormatString) {
+                return ((BigDecimal) o).toPlainString();
+            } else {
+                return o.toString();
+            }
+        } else if (o instanceof java.sql.Date) {
+            return ((java.sql.Date) o).getTime();
+        } else if (o instanceof Time) {
+            return ((Time) o).getTime();
+        } else if (o instanceof Timestamp) {
+            return ((Timestamp) o).getTime();
+        }
+        // primitive types (Integer, etc) are left unchanged
+        return o;
     }
 
 }
