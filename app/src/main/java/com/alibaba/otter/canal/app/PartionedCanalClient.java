@@ -33,14 +33,15 @@ public class PartionedCanalClient extends AbstractCanalClient {
     private Schema schema;
     private static DataFileWriter<GenericRecord> writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter());
     private static boolean inited = false;
+    private static File file;
 
     public PartionedCanalClient(String destination, String schemaPath) throws IOException {
         super(destination);
         this.schema = getSchemaFromFile(schemaPath);
         synchronized (writer) {
             if (!inited) {
-                File file = new File(schemaPath + ".data");
-                //writer.create(schema, file);
+                file = new File(schemaPath + ".data");
+                writer.create(schema, file);
                 inited = true;
                 logger.info("avro writer created");
             }
