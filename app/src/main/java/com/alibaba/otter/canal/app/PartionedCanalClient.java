@@ -140,7 +140,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
         GenericData.Record record = new GenericData.Record(schema);
         logger.info("create a new recode\n");
         for (CanalEntry.Column column : columns) {
-            record.put(column.getName(), SqlUtils.stringToSqlValue(column.getValue(), column.getSqlType(), column.hasIsNull(), false));
+            record.put(column.getName(), toAvro(SqlUtils.stringToSqlValue(column.getValue(), column.getSqlType(), column.hasIsNull(), false)));
             StringBuilder builder = new StringBuilder();
             builder.append(column.getName() + " : " + column.getValue());
             builder.append("    type=" + column.getMysqlType());
