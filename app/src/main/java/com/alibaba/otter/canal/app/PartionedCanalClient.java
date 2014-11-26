@@ -35,14 +35,12 @@ public class PartionedCanalClient extends AbstractCanalClient {
         super(destination);
         this.schema = getSchemaFromFile(schemaPath);
         synchronized (writer) {
-            if (null == writer) {
                 if (!inited) {
                     File file = new File(schemaPath + "avro.data");
                     writer.create(schema, file);
                     inited = true;
                     logger.info("avro writer created");
                 }
-            }
         }
     }
 
