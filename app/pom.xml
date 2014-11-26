@@ -44,6 +44,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!--for sql vonverter-->
+		<dependency>
+			<groupId>com.alibaba.otter</groupId>
+			<artifactId>node.etl</artifactId>
+			<version>4.2.11</version>
+		</dependency>
 		<!-- test dependency -->
 		<dependency>
 			<groupId>junit</groupId>

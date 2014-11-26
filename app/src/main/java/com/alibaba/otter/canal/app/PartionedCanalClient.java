@@ -4,6 +4,7 @@ import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.common.utils.AddressUtils;
 import com.alibaba.otter.canal.protocol.CanalEntry;
+import com.alibaba.otter.node.etl.common.db.utils.SqlUtils;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileWriter;
