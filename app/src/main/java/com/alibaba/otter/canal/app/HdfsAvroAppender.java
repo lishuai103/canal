@@ -78,8 +78,10 @@ public class HdfsAvroAppender {
 
     public synchronized void append(GenericRecord record) {
         try {
+            LOG.info("start append a record for " + record.getSchema().getName());
             writer.append(record);
-            LOG.info("append a record for " + record.getSchema().getName());
+            out.hflush();
+            LOG.info("end append a record for " + record.getSchema().getName());
 
         } catch (IOException e) {
             e.printStackTrace();
