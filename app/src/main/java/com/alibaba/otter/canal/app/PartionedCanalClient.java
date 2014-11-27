@@ -37,7 +37,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
     private static File file;
     private static HdfsAvroAppender hdfsAvroAppender;
 
-    public static void setHdfsAvroAppender(HdfsAvroAppender hdfsAvroAppender) {
+    public synchronized static void setHdfsAvroAppender(HdfsAvroAppender hdfsAvroAppender) {
         if (!inited) {
             PartionedCanalClient.hdfsAvroAppender = hdfsAvroAppender;
             inited = true;
