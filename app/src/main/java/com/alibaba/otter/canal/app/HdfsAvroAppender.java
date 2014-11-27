@@ -63,7 +63,7 @@ public class HdfsAvroAppender {
     public void init() throws IOException {
         Path f = new Path(hdfsFilePath);
         if (fs.exists(f)) {
-            fs.rename(f, new Path(hdfsFilePath + System.currentTimeMillis()));
+            fs.rename(f, new Path(hdfsFilePath + "." + System.currentTimeMillis()));
             f = new Path(hdfsFilePath);
         }
         fs.create(f);
