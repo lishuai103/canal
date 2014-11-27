@@ -73,7 +73,7 @@ public class HdfsAvroAppender {
         }
     }
 
-    public synchronized static void append(GenericRecord record) {
+    public synchronized void append(GenericRecord record) {
         try {
             writer.append(record);
         } catch (IOException e) {
