@@ -80,6 +80,8 @@ public class HdfsAvroAppender {
             //在这里调用hflush 太重了，应该另外起一个线程，单独做；
             writer.flush();
             writer.fSync();
+            out.flush();
+            out.sync();
             out.hflush();
             out.hsync();
             LOG.info("end append a record for " + record.getSchema().getName());
