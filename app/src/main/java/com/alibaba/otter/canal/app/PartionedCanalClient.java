@@ -33,14 +33,26 @@ import java.util.List;
 public class PartionedCanalClient extends AbstractCanalClient {
     private Schema schema;
     private static DataFileWriter<GenericRecord> writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter());
-    private static boolean inited = false;
+    private static boolean appenderInited = false;
+    private static boolean deleterInited = false;
+
     private static File file;
     private static HdfsAvroAppender hdfsAvroAppender;
+    private static HdfsAvroAppender hdfsAvroDeleter;
+
+    public static void setHdfsAvroDeleter(HdfsAvroAppender hdfsAvroDeleter) {
+        if (!deleterInited) {
+            PartionedCanalClient.hdfsAvroDeleter = hdfsAvroAppender;
+            deleterInited = true;
+        } else {
+            return;
+        }
+    }
 
     public synchronized static void setHdfsAvroAppender(HdfsAvroAppender hdfsAvroAppender) {
-        if (!inited) {
+        if (!appenderInited) {
             PartionedCanalClient.hdfsAvroAppender = hdfsAvroAppender;
-            inited = true;
+            appenderInited = true;
         } else {
             return;
         }
@@ -128,9 +140,9 @@ public class PartionedCanalClient extends AbstractCanalClient {
 
                 for (CanalEntry.RowData rowData : rowChage.getRowDatasList()) {
                     if (eventType == CanalEntry.EventType.DELETE) {
-                        processColumn(rowData.getBeforeColumnsList());
-                    } else if (eventType == CanalEntry.EventType.INSERT) {
-                        processColumn(rowData.getAfterColumnsList());
+                        processColumn(rowData.getBeforeColumnsList(), true);
+                    } else if (eventType == CanalEntry.EventType.INSERT || eventType == CanalEntry.EventType.UPDATE) {
+                        processColumn(rowData.getAfterColumnsList(), false);
                     } else {
                         processColumn(rowData.getAfterColumnsList());
                     }
@@ -139,8 +151,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
         }
     }
 
-    @Override
-    protected void processColumn(List<CanalEntry.Column> columns) {
+    protected void processColumn(List<CanalEntry.Column> columns, boolean delete) {
         GenericData.Record record = new GenericData.Record(schema);
         logger.info("create a new recode\n");
         for (CanalEntry.Column column : columns) {
@@ -154,7 +165,13 @@ public class PartionedCanalClient extends AbstractCanalClient {
             builder.append(SEP);
             logger.info(builder.toString());
         }
-        PartionedCanalClient.hdfsAvroAppender.append(record);
+        if (delete) {
+            PartionedCanalClient.hdfsAvroDeleter.append(record);
+            logger.info("delete a record");
+        } else if (!delete) {
+            PartionedCanalClient.hdfsAvroAppender.append(record);
+            logger.info("update a record");
+        }
     }
 
     public static void main(String args[]) throws IOException {
@@ -162,12 +179,16 @@ public class PartionedCanalClient extends AbstractCanalClient {
         String[] destinations = {"hotelmaster01", "hotelmaster02", "hotelmaster03", "hotelmaster04"};
         String confDir = System.getProperty("canal.conf.dir");
         String schemaPath = confDir + "/schema/com.elong.corp.hotel_property_master.1.avsc";
-        String appendPath = "/user/jian.wang/test.append.data";
+        String appendPath = "/data/hive/warehouse/ods.db/wangjiantest/slice=upsert/test.append.data";
+        String deletePath = "/data/hive/warehouse/ods.db/wangjiantest/slice=delete/test.append.data";
         Configuration conf = new Configuration();
         conf.set("fs.default.name", "hdfs://namenode001.hadoop.bjy.elong.com:9000");
         HdfsAvroAppender hdfsAvroAppender = new HdfsAvroAppender(appendPath, conf, getSchemaFromFile(schemaPath));
+        HdfsAvroAppender hdfsAvroDeleter = new HdfsAvroAppender(deletePath, conf, getSchemaFromFile(schemaPath));
         hdfsAvroAppender.init();
+        hdfsAvroDeleter.init();
         setHdfsAvroAppender(hdfsAvroAppender);
+        setHdfsAvroDeleter(hdfsAvroDeleter);
 
 
         final List<PartionedCanalClient> clients = new LinkedList<PartionedCanalClient>();
