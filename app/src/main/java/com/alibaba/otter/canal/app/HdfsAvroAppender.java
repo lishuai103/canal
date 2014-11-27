@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
+import org.apache.hadoop.hdfs.protocol.ClientProtocol;
 
 import java.io.IOException;
 
@@ -71,6 +72,8 @@ public class HdfsAvroAppender {
         }
         fs.create(f);
         fs.close();
+        ClientProtocol client;
+
         fs = FileSystem.get(conf);
         out = fs.append(f);
         writer.create(this.schema, out);
@@ -81,10 +84,10 @@ public class HdfsAvroAppender {
             LOG.info("start append a record for " + record.getSchema().getName());
             writer.append(record);
             //在这里调用hflush 太重了，应该另外起一个线程，单独做；
-            writer.fSync();
             writer.flush();
-            out.hsync();
+            writer.fSync();
             out.hflush();
+            out.hsync();
             LOG.info("end append a record for " + record.getSchema().getName());
 
         } catch (IOException e) {

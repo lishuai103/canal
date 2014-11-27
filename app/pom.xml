@@ -50,10 +50,9 @@
 			<artifactId>node.etl</artifactId>
 			<version>4.2.11</version>
 		</dependency>
-		<!--hdfs-->
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-client</artifactId>
+			<artifactId>hadoop-hdfs</artifactId>
 			<version>2.0.0-cdh4.1.2</version>
 			<exclusions>
 				<exclusion>
@@ -70,9 +69,10 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-hdfs</artifactId>
+			<artifactId>hadoop-client</artifactId>
 			<version>2.0.0-cdh4.1.2</version>
 			<exclusions>
 				<exclusion>
