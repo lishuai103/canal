@@ -154,7 +154,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
             builder.append(SEP);
             logger.info(builder.toString());
         }
-        HdfsAvroAppender.append(record);
+        PartionedCanalClient.hdfsAvroAppender.append(record);
     }
 
     public static void main(String args[]) throws IOException {
