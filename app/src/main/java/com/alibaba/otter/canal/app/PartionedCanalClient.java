@@ -7,13 +7,10 @@ import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.alibaba.otter.node.etl.common.db.utils.SqlUtils;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.avro.Schema;
-import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumReader;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.conf.Configuration;
 
@@ -52,27 +49,6 @@ public class PartionedCanalClient extends AbstractCanalClient {
     public PartionedCanalClient(String destination, String schemaPath) throws IOException {
         super(destination);
         this.schema = getSchemaFromFile(schemaPath);
-        synchronized (writer) {
-            if (!inited) {
-                file = new File(schemaPath + ".data");
-                try {
-                    DatumReader<GenericRecord> datumReader = new GenericDatumReader<GenericRecord>(schema);
-                    DataFileReader<GenericRecord> dataFileReader =
-                            new DataFileReader<GenericRecord>(file, datumReader);
-                } catch (IOException e) {
-                    if (e.getMessage().equals("Not a data file.")) {
-                        writer.create(schema, file);
-                        writer.close();
-                    } else {
-                        throw e;
-                    }
-                }
-
-                inited = true;
-                writer.appendTo(file);
-                logger.info("avro writer created");
-            }
-        }
     }
 
     public synchronized static void append(GenericRecord record) throws IOException {
