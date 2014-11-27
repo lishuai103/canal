@@ -30,7 +30,7 @@ public class HdfsAvroAppender {
     private Schema schema;
     private FSDataOutputStream out;
     private DataFileWriter<GenericRecord> writer =
-            new DataFileWriter<GenericRecord>(new GenericDatumWriter()).setSyncInterval(1000);
+            new DataFileWriter<GenericRecord>(new GenericDatumWriter()).setSyncInterval(100);
 
     public HdfsAvroAppender(String hdfsFilePath, Configuration conf, Schema schema) throws IOException {
         this.hdfsFilePath = hdfsFilePath;
@@ -81,6 +81,7 @@ public class HdfsAvroAppender {
             LOG.info("start append a record for " + record.getSchema().getName());
             writer.append(record);
             //在这里调用hflush 太重了，应该另外起一个线程，单独做；
+            writer.flush();
             out.hflush();
             LOG.info("end append a record for " + record.getSchema().getName());
 
