@@ -8,6 +8,8 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 
@@ -21,6 +23,7 @@ import java.io.IOException;
  */
 
 public class HdfsAvroAppender {
+    Log LOG = LogFactory.getLog(HdfsAvroAppender.class);
     private String hdfsFilePath;
     private FileSystem fs;
     private Configuration conf;
@@ -76,6 +79,8 @@ public class HdfsAvroAppender {
     public synchronized void append(GenericRecord record) {
         try {
             writer.append(record);
+            LOG.info("append a record for " + record.getSchema().getName());
+
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("append error");
