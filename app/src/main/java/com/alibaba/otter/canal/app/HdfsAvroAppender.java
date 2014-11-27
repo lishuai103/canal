@@ -62,15 +62,13 @@ public class HdfsAvroAppender {
 
     public void init() throws IOException {
         Path f = new Path(hdfsFilePath);
-        if (!fs.exists(f)) {
-            FSDataOutputStream outstream = fs.create(f);
-            outstream.close();
+        if (fs.exists(f)) {
+            fs.rename(f, new Path(hdfsFilePath + System.currentTimeMillis()));
+            f = new Path(hdfsFilePath);
         }
+        fs.create(f);
         out = fs.append(f);
-
-        if (!isADataFile(hdfsFilePath, fs)) {
-            writer.create(this.schema, out);
-        }
+        writer.create(this.schema, out);
     }
 
     public synchronized void append(GenericRecord record) {
