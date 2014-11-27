@@ -67,6 +67,8 @@ public class HdfsAvroAppender {
             f = new Path(hdfsFilePath);
         }
         fs.create(f);
+        fs.close();
+        fs = FileSystem.get(conf);
         out = fs.append(f);
         writer.create(this.schema, out);
     }
