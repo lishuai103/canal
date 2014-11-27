@@ -35,7 +35,7 @@ public class HdfsAvroAppender {
     public HdfsAvroAppender(String hdfsFilePath, Configuration conf, Schema schema) throws IOException {
         this.hdfsFilePath = hdfsFilePath;
         this.conf = conf;
-        this.fs = FileSystem.get(conf);
+        this.fs = FileSystem.newInstance(conf);
         this.schema = schema;
     }
 
