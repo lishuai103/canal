@@ -12,7 +12,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
-import org.apache.hadoop.hdfs.protocol.ClientProtocol;
 
 import java.io.IOException;
 
@@ -70,12 +69,7 @@ public class HdfsAvroAppender {
             fs.rename(f, new Path(hdfsFilePath + "." + System.currentTimeMillis()));
             f = new Path(hdfsFilePath);
         }
-        fs.create(f);
-        fs.close();
-        ClientProtocol client;
-
-        fs = FileSystem.get(conf);
-        out = fs.append(f);
+        out = fs.create(f);
         writer.create(this.schema, out);
     }
 
