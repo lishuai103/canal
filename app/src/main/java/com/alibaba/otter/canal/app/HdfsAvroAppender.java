@@ -29,7 +29,7 @@ public class HdfsAvroAppender {
     private Configuration conf;
     private Schema schema;
     private FSDataOutputStream out;
-    private static DataFileWriter<GenericRecord> writer =
+    private DataFileWriter<GenericRecord> writer =
             new DataFileWriter<GenericRecord>(new GenericDatumWriter()).setSyncInterval(1000);
 
     public HdfsAvroAppender(String hdfsFilePath, Configuration conf, Schema schema) throws IOException {

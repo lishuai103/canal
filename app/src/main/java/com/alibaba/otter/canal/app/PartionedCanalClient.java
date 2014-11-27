@@ -180,7 +180,7 @@ public class PartionedCanalClient extends AbstractCanalClient {
         String confDir = System.getProperty("canal.conf.dir");
         String schemaPath = confDir + "/schema/com.elong.corp.hotel_property_master.1.avsc";
         String appendPath = "/data/hive/warehouse/ods.db/wangjiantest/slice=upsert/test.append.data";
-        String deletePath = "/data/hive/warehouse/ods.db/wangjiantest/slice=delete/test.append.data";
+        String deletePath = "/data/hive/warehouse/ods.db/wangjiantest/slice=delete/test.delete.data";
         Configuration conf = new Configuration();
         conf.set("fs.default.name", "hdfs://namenode001.hadoop.bjy.elong.com:9000");
         HdfsAvroAppender hdfsAvroAppender = new HdfsAvroAppender(appendPath, conf, getSchemaFromFile(schemaPath));
