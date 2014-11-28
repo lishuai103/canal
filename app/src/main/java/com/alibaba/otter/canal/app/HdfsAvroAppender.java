@@ -94,6 +94,9 @@ public class HdfsAvroAppender {
             fs.rename(f, new Path(hdfsFilePath + "." + System.currentTimeMillis()));
             f = new Path(hdfsFilePath);
         }
+        if (null != out) {
+            out.close();
+        }
         out = fs.create(f);
         writer.create(this.schema, out);
         if (!started) {
