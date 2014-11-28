@@ -64,6 +64,8 @@ public class HdfsAvroAppender {
     }
 
     public void start() {
+        started = true;
+        LOG.info("file rotator started");
         thread = new Thread(new Runnable() {
             public void run() {
                 try {
@@ -81,8 +83,6 @@ public class HdfsAvroAppender {
                 }
             }
         });
-        started = true;
-        LOG.info("file rotator started");
     }
 
 
