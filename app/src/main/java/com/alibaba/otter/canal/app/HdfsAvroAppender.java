@@ -29,8 +29,9 @@ public class HdfsAvroAppender {
     private Configuration conf;
     private Schema schema;
     private FSDataOutputStream out;
-    private DataFileWriter<GenericRecord> writer =
-            new DataFileWriter<GenericRecord>(new GenericDatumWriter()).setSyncInterval(100);
+    private DataFileWriter<GenericRecord> writer = null;
+    private Thread thread = null;
+    private boolean started = false;
 
     public HdfsAvroAppender(String hdfsFilePath, Configuration conf, Schema schema) throws IOException {
         this.hdfsFilePath = hdfsFilePath;
@@ -62,8 +63,30 @@ public class HdfsAvroAppender {
         return isAdataFile;
     }
 
+    public void start() {
+        thread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(60 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized (this) {
+                    try {
+                        init();
+                        LOG.info("create a new data file");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        started = true;
+    }
+
 
     public void init() throws IOException {
+        this.writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter()).setSyncInterval(100);
         Path f = new Path(hdfsFilePath);
         if (fs.exists(f)) {
             fs.rename(f, new Path(hdfsFilePath + "." + System.currentTimeMillis()));
@@ -71,24 +94,28 @@ public class HdfsAvroAppender {
         }
         out = fs.create(f);
         writer.create(this.schema, out);
+        if (!started) {
+            start();
+        }
     }
 
     public synchronized void append(GenericRecord record) {
-        try {
-            LOG.info("start append a record for " + record.getSchema().getName());
-            writer.append(record);
-            //在这里调用hflush 太重了，应该另外起一个线程，单独做；
-            writer.flush();
-            writer.fSync();
-            out.flush();
-            out.sync();
-            out.hflush();
-            out.hsync();
-            LOG.info("end append a record for " + record.getSchema().getName());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("append error");
+        synchronized (this) {
+            try {
+                LOG.info("start append a record for " + record.getSchema().getName());
+                writer.append(record);
+                //在这里调用hflush 太重了，应该另外起一个线程，单独做；
+                writer.flush();
+                writer.fSync();
+                out.flush();
+                out.sync();
+                out.hflush();
+                out.hsync();
+                LOG.info("end append a record for " + record.getSchema().getName());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("append error");
+            }
         }
     }
 
