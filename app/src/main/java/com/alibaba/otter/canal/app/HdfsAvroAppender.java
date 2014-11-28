@@ -88,15 +88,22 @@ public class HdfsAvroAppender {
 
 
     public void init() throws IOException {
+        if (null != writer) {
+            writer.close();
+        }
+
+        if (null != out) {
+            out.close();
+        }
+
+
         this.writer = new DataFileWriter<GenericRecord>(new GenericDatumWriter()).setSyncInterval(100);
         Path f = new Path(hdfsFilePath);
         if (fs.exists(f)) {
             fs.rename(f, new Path(hdfsFilePath + "." + System.currentTimeMillis()));
             f = new Path(hdfsFilePath);
         }
-        if (null != out) {
-            out.close();
-        }
+
         out = fs.create(f);
         writer.create(this.schema, out);
         if (!started) {
