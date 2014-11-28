@@ -82,6 +82,7 @@ public class HdfsAvroAppender {
             }
         });
         started = true;
+        LOG.info("file rotator started");
     }
 
 
