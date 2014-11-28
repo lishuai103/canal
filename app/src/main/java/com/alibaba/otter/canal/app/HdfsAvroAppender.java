@@ -66,17 +66,19 @@ public class HdfsAvroAppender {
     public void start() {
         thread = new Thread(new Runnable() {
             public void run() {
-                try {
-                    Thread.sleep(60 * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                synchronized (this) {
+                while (true) {
                     try {
-                        init();
-                        LOG.info("create a new data file");
-                    } catch (IOException e) {
+                        Thread.sleep(60 * 1000);
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
+                    }
+                    synchronized (this) {
+                        try {
+                            init();
+                            LOG.info("create a new data file");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
